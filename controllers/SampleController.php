@@ -12,6 +12,10 @@
             $this->generateView("./views/pages/test.php");
         }
 
+        public function hello(){
+            echo "Hello World";
+        }
+
         //HTTP POST
         public function insert()
         {

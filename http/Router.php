@@ -2,7 +2,7 @@
 
     require_once('./http/Request.php');
     require_once('./http/Route.php');
-    require_once('./http/Middleware.php');
+    require_once('./http/middleware/Middleware.php');
 
     use Opis\Closure\SerializableClosure;
 
@@ -16,39 +16,73 @@
 
         private static SplObjectStorage $delete; //Keeps track of all delete routes
 
-        private static SplObjectStorage $middleWare; //Keeps track of all middleware
+        private static array $middleWare = []; //Keeps track of all middleware
 
         private static $errors = []; //Keeps track of error handler functions
 
         /**
          * Adds a new POST route to app
          */
-        public static function POST($route, $callback){
+        public static function POST($route, $callback) : Route
+        {
             $route = new Route($route);
             self::$post[$route] = self::storeCallback($callback);
+
+            return $route;
         }
 
-        public static function GET($route, $callback){
+        public static function GET($route, $callback) : Route
+        {
             $route = new Route($route);
             self::$get[$route] = self::storeCallback($callback);
+
+            return $route;
         }
 
-        public static function PUT($route, $callback){
+        public static function PUT($route, $callback) : Route
+        {
             $route = new Route($route);
             self::$put[$route] = self::storeCallback($callback);
+
+            return $route;
         }
 
-        public static function DELETE($route, $callback){
+        public static function DELETE($route, $callback) : Route
+        {
             $route = new Route($route);
             self::$delete[$route] = self::storeCallback($callback);
+
+            return $route;
         }
 
-        public static function MIDDLEWARE($route, $callback){
-            if(empty($route)) $route = '/';
-            $route = new Middleware($route);
-            self::$middleWare[$route] = self::storeCallback($callback);
+        /**
+         * Checks if an instance of the middleware exists and creates one if not.
+         * @param middlewareName - name of the middleware file
+         * @param className - name of the middleware class (Needed only if the file name and class name is different)
+         */
+        public static function MIDDLEWARE(string $middleWareName,string $className = null) : void
+        {
+            $className = ($className == null)? $middleWareName : $className;
+
+            require_once("./http/middleware/$middleWareName.php");
+
+            if(! class_exists($className)){
+                throw new Exception("Class $className does not exist");
+            }
+
+            foreach (self::$middleWare as $mwre) {
+                # code...
+                if(is_a($mwre,$className)){
+                    return;
+                }
+            }
+
+            self::$middleWare[$className] = new $className();
         }
 
+        /**
+         * Handles 404 status
+         */
         public static function notFound(){
             header("HTTP/1.1 404 Not Found");
             if(file_exists('./views/errors/404.php')){
@@ -66,34 +100,23 @@
         public static function listen(){
             $request = new Request();
 
-            $used_middleware = 'none';
-
-            foreach (self::$middleWare as $key => $value) {
-                if($value->matchRoute($request)){
-                    $used_middleware = self::handleCallback(self::$middleWare[$value])($request);
-                    if($used_middleware !== 'NEXT'){
-                        return;
-                    }
-                }
-            }
-
             if( $request->method === 'POST'){
-                self::validateRoute($request,self::$post)($request);
+                self::executeRoute($request,self::$post);
                 return;
             }
 
             if( $request->method === 'PUT'){
-                self::validateRoute($request,self::$put)($request);
+                self::executeRoute($request,self::$put);
                 return;
             }
 
             if ($request->method === 'DELETE'){
-                self::validateRoute($request,self::$delete)($request);
+                self::executeRoute($request,self::$delete);
                 return;
             }
 
             if( $request->method === 'GET'){
-                self::validateRoute($request, self::$get)($request);
+                self::executeRoute($request, self::$get);
                 return;
             }
 
@@ -113,16 +136,44 @@
          * Handles route not found exception
          * If the route was not found sends a 404 error status and executes the 404 handler
          */
-        private static function validateRoute($path, $requestArray){
-            
+        private static function executeRoute(Request $request, $requestArray) : void
+        {
+            $callback = null;
+            $route = null;
+
             foreach ($requestArray as $key => $value) {
-                if($value->matchRoute($path)){
-                    return self::handleCallback($requestArray[$value]);
+                if($value->matchRoute($request)){
+                    $callback = self::handleCallback($requestArray[$value]);
+                    $route = $value;
                 }
             }
 
-            self::notFound();
-            exit(0);
+            if($callback == null) {
+                self::notFound();
+                exit(0); // Exit the program if the endpoint is not found
+            }
+
+            $middleWareResult = $route->executeMiddleware(function ($middlewareClasses) use($request) {
+                $result = NEXT_ROUTE;
+
+                if(count($middlewareClasses) > 0){
+                    $result = 0;
+
+                    foreach ($middlewareClasses as $middlewareClass) {
+                        # code...
+                        if(array_key_exists($middlewareClass, self::$middleWare)){
+                            $result = self::$middleWare[$middlewareClass]->handleIncoming($request);
+                            if($result !== NEXT_ROUTE) return $result;
+                        }
+                    }
+                }
+
+                return $result;
+            });
+
+            if($middleWareResult !== NEXT_ROUTE) return;
+
+            $callback($request);
         }
 
         /**
@@ -165,6 +216,7 @@
          *  Put all configuration codes for this class in this method
          */
         public static function init(){
+            define("NEXT_ROUTE",25); // Used to indicate middleware should move to the next endpoint
 
             /* if (file_exists('./routes/cached_routes.php')) {
                 $routes = unserialize(file_get_contents('./routes/cached_routes.php'));
@@ -182,7 +234,6 @@
                 self::$get = new SplObjectStorage();
                 self::$put = new SplObjectStorage();
                 self::$delete = new SplObjectStorage();
-                self::$middleWare = new SplObjectStorage();
                 
                 include('./routes/routes.php');
 
