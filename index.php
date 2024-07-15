@@ -6,15 +6,8 @@
     require_once('./http/config/errorHandler.php');
     require_once('./database/DB.php');
     include_once('./controllers/SampleController.php');
+    require_once('./bootstrap/kernel.php');
     
 
-    //Initialize the Router
-    Router::init();
-
-    //Setup databse connections
-    DB::connect();
-
-    //Initialize the session
-    session_start();
-
-    Router::listen();
+    //Start the program
+    bootstrap();

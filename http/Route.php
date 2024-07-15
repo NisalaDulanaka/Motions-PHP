@@ -75,6 +75,9 @@
             return $result;
         }
 
+        /**
+         * Adds a middleware for this route
+         */
         public function middleWare(string $middleWareName,string $className = null) : Route
         {
             $className = ($className == null)? $middleWareName : $className;
