@@ -8,8 +8,8 @@ require_once('./http/config/environment.php');
 //Setup Routes
 Router::GET('/',[SampleController::class,'index']);
 
-Router::GET('/hello',[SampleController::class,'hello'])
-    ->middleWare("TestMiddleWare");
+Router::GET('/hello',[SampleController::class,'hello']);
+    
 
 Router::POST('/add', [SampleController::class, 'insert']);
 

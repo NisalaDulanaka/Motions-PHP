@@ -9,11 +9,13 @@
         public function index()
         {
             // Sends the response
-            $this->generateView("./views/pages/test.php");
+            return $this->view("./views/pages/test.php");
         }
 
         public function hello(){
-            echo "Hello World";
+            return [
+                "message" => "Hello"
+            ];
         }
 
         //HTTP POST

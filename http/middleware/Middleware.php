@@ -10,5 +10,5 @@ abstract class Middleware{
     /**
      * Handles outgoing requests
      */
-    abstract public function handleOutgoing(Request $request);
+    abstract public function handleOutgoing($response);
 }

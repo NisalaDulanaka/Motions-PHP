@@ -18,7 +18,10 @@
 
         private static array $middleWare = []; //Keeps track of all middleware
 
-        private static $errors = []; //Keeps track of error handler functions
+        private static array $contentMap = [
+            'application/json' => ['array','object'],
+            'text/plain' => ['string']
+        ];
 
         /**
          * Adds a new POST route to app
@@ -173,7 +176,7 @@
 
             if($middleWareResult !== NEXT_ROUTE) return;
 
-            $callback($request);
+            self::sendResponse($callback($request));
         }
 
         /**
@@ -249,5 +252,23 @@
             
         }
 
+        /**
+         * Determines the Content-Type of the response sends the response.
+         */
+        private static function sendResponse($responseData = null){
+            $contentType = 'text/html';
+            $responseDataType = gettype($responseData);
+            
+            foreach (self::$contentMap as $key => $value) {
+                if(in_array($responseDataType, $value)){
+                    $contentType = $key;
+                }
+            }
+
+            if($contentType == 'application/json') $responseData = json_encode($responseData, JSON_PRETTY_PRINT);
+
+            header("Content-Type: $contentType");
+            echo $responseData;
+        }
     }
     
