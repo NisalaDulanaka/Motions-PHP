@@ -1,8 +1,5 @@
 <?php
 
-require_once('./http/Router.php');
-require_once('./http/config/environment.php');
-
 //This is the file where you should set up all your routes
 
 //Setup Routes
