@@ -1,5 +1,16 @@
 <?php
 
+    require_once('./bootstrap/config/environment.php');
+    require_once('./bootstrap/config/errorHandler.php');
+    require('./controllers/Controller.php');
+    require('./http/Router.php');
+    require_once('./database/DB.php');
+
+    //Controller imports start
+    include_once('./controllers/SampleController.php');
+    //Controller imports end
+
+    
     //Add global middleware
     $globalMiddleware = [
 

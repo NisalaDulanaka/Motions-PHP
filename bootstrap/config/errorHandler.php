@@ -1,7 +1,7 @@
 <?php
 
     //Print the erro message in a nice format
-    function printErrorMessage(string $message,string $errorFile, string $errorLine, $errorStack){
+    function printErrorMessage(string $message,string $errorFile = "File could not be found", string $errorLine = "Line could not be found", $errorStack = ""){
         $errorObject = [
             "message" => $message, "file" => $errorFile, 
             "line" => $errorLine, "stack" => $errorStack
