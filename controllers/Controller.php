@@ -4,7 +4,7 @@
     class Controller{
         use Terminal;
 
-        public function generateView($path,array $data = []){
+        public function view($path,array $data = []){
 
             foreach ($data as $key => $value) {
                 ${$key} = $value;

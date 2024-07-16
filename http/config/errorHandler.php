@@ -1,8 +1,11 @@
 <?php
 
     //Print the erro message in a nice format
-    function printErrorMessage(string $message){
-        $errorMessage = $message;
+    function printErrorMessage(string $message,string $errorFile, string $errorLine, $errorStack){
+        $errorObject = [
+            "message" => $message, "file" => $errorFile, 
+            "line" => $errorLine, "stack" => $errorStack
+        ];
 
         include("./views/error_page.php");
     }
@@ -15,8 +18,32 @@
         throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
     }
 
-    function exceptionHandler($exception){
-        printErrorMessage($exception);
+    function exceptionHandler(Error | Exception $exception){
+        ob_clean();
+
+        $errorMessage = "Message: " . $exception->getMessage() . "\n";
+        $errorFile = "File: " . $exception->getFile() . "<br>";
+        $errorLine = "Code: " . $exception->getCode() . "&nbsp;&nbsp;&nbsp;&nbsp";
+        $errorLine .= "Line: " . $exception->getLine() . "<br>";
+        $errorLine .= "File: " . $exception->getFile() . "<br>";
+        $errorStack = formatStackTrace($exception->getTrace());
+
+        printErrorMessage($errorMessage,$errorFile,$errorLine,$errorStack);
+    }
+
+    function formatStackTrace($traceArray) {
+        $traceString = '';
+        foreach ($traceArray as $index => $trace) {
+            $traceString .= "#" . $index . " ";
+            if (isset($trace['file'])) {
+                $traceString .= $trace['file'] . "(" . $trace['line'] . "): ";
+            }
+            if (isset($trace['class'])) {
+                $traceString .= $trace['class'] . "->";
+            }
+            $traceString .= $trace['function'] . "()\n";
+        }
+        return $traceString;
     }
 
     set_error_handler("errorToException");
