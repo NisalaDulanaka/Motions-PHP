@@ -2,14 +2,20 @@
 
     include_once('./traits/terminal.php');
 
+    /**
+     * A simple DB class with functions to interact and automate repetitive database interactions
+     */
     class DB{
         use Terminal;
 
+        /**
+         * Represents the current connection
+         */
         private static ?mysqli $conn = null ;
-        private static $host;
-        private static $dataBase;
-        private static $userName;
-        private static $password;
+        private static string $host;
+        private static string $dataBase;
+        private static string $userName;
+        private static string $password;
         
         public static function connect(){
             self::$host = getenv('HOST');
@@ -23,18 +29,28 @@
             self::$conn = new mysqli(self::$host,self::$userName,self::$password,self::$dataBase);
 
             if(self::$conn->connect_error){
-                //echo('Error connecting to database ' . self::$conn->error);
+                
                 self::log('Error connecting to database ' . self::$conn->error);
                 exit(0);
             }
         }
 
+        /**
+         * Gives access to the current database connnection object
+         * @return mysqli The current database connection
+         */
         public static function getConnection() : mysqli
         {
             return self::$conn;
         }
 
-        public static function select($query,$type = MYSQLI_ASSOC) : array
+        /**
+         * Executes a simple select query
+         * @param string $query The select query
+         * @param int $type The type of the resultset
+         * @return array The resultset
+         */
+        public static function select(string $query,int $type = MYSQLI_ASSOC) : array
         {
             $results = [];
 
@@ -50,10 +66,10 @@
         /**
          *  Executes multiple queries at once and frees results sets
          *  Use for insert update and delete related multi queries
-         *  @param $query - the multi query to be executed
-         *  @return bool - returns true if the query was successful and vice versa
+         *  @param string $query The multi query to be executed
+         *  @return bool Whether the query was successful or not
          */
-        public static function multiQuery($query) : bool
+        public static function multiQuery(string $query) : bool
         {
             if (self::$conn->multi_query($query)) {
                 // Iterate through all result sets and free them
@@ -73,8 +89,8 @@
         /**
          *  Executes multiple queries at once and frees result sets
          *  Use for multi queries which produce result sets
-         *  @param $query - the multi query to be executed
-         *  @return array - returns an associative array representing the resultset
+         *  @param string $query The multi query to be executed
+         *  @return array Associative array representing the resultset
          */
         public static function multiSelect(String $query,int $type = 0) : array
         {

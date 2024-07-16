@@ -8,14 +8,14 @@
         //HTTP GET
         public function index()
         {
-            // Sends the response
-            
-            return $this->view("./views/welcome_page.php");
+            // Sends the view
+            return $this->view("welcome_page.php");
         }
 
-        public function hello(){
+        public function hello()
+        {
             return [
-                "message" => "Hello"
+                "message" => "Hello! Welcome to Motions PHP"
             ];
         }
 
