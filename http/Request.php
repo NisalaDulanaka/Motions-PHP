@@ -41,7 +41,7 @@
         /**
          * Provides access to the query parameters
          */
-        public function query($key, $defaultValue) : string | array
+        public function query($key, $defaultValue) : null | int | string | array
         {
             if( $key === null || empty($key))
                 return $this->query;
