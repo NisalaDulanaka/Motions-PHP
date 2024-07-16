@@ -1,12 +1,12 @@
 <?php
 
-require_once('./http/Router.php');
-require_once('./http/config/environment.php');
-
 //This is the file where you should set up all your routes
 
 //Setup Routes
 Router::GET('/',[SampleController::class,'index']);
+
+Router::GET('/hello',[SampleController::class,'hello']);
+    
 
 Router::POST('/add', [SampleController::class, 'insert']);
 
