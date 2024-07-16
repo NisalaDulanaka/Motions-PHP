@@ -10,6 +10,7 @@
      * Sessions and Database connections are made from here
      */
     function bootstrap(){
+        ob_start();
         //Initialize the Router
         Router::init();
 

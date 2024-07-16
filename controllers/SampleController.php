@@ -9,7 +9,8 @@
         public function index()
         {
             // Sends the response
-            return $this->view("./views/pages/test.php");
+            
+            return $this->view("./views/welcome_page.php");
         }
 
         public function hello(){
