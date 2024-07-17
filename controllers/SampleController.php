@@ -23,26 +23,26 @@
         public function insert()
         {
             // Sends the response
-            echo json_encode([
+            return [
                 "message" => "Data inserted"
-            ]);
+            ];
         }
 
         //HTTP PUT
         public function update()
         {
             // Sends the response
-            echo json_encode([
+            return [
                 "message" => "Data updated"
-            ]);
+            ];
         }
 
         //HTTP DELETE
         public function delete()
         {
             // Sends the response
-            echo json_encode([
+            return [
                 "message" => "Data deleted"
-            ]);
+            ];
         }
     }

@@ -21,4 +21,42 @@
 
             require($path);
         }
+
+        /**
+         * Sets the unauthorized response codes and sends a message
+         * @param string $message The message to be shown in the response
+         */
+        public function Unauthorized(string $message = "Unauthorized access") : void
+        {
+            http_response_code(401);
+
+            // Set content type to JSON or HTML as needed
+            if(isset($_SERVER['HTTP_CONTENT_TYPE']) && $_SERVER['HTTP_CONTENT_TYPE'] == 'application/json'){
+                header('Content-Type: application/json');
+            }
+
+            echo json_encode(['error' => $message]);
+
+            // Terminate the script
+            exit();
+        }
+
+        /**
+         * Sets the not found response codes and sends a message
+         * @param string $message The message to be shown in the response
+         */
+        public function NotFound(string $message = "Resource not found") : void
+        {
+            http_response_code(404);
+
+            // Set content type to JSON or HTML as needed
+            if(isset($_SERVER['HTTP_CONTENT_TYPE']) && $_SERVER['HTTP_CONTENT_TYPE'] == 'application/json'){
+                header('Content-Type: application/json');
+            }
+
+            echo json_encode(['error' => $message]);
+
+            // Terminate the script
+            exit();
+        }
     }

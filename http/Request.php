@@ -19,6 +19,10 @@
          */
         public string $path;
         /**
+         * Stores all the headers set by the request
+         */
+        private array $headers;
+        /**
          * Stores get request query string
          */
         private array $query;
@@ -26,6 +30,9 @@
          * Stores all the request body data
          */
         private array $body;
+        /**
+         * Stores the route parameters
+         */
         public $routeParameters = [];
 
         public function __construct(){
@@ -36,6 +43,8 @@
             $this->path = $request_uri['path'];
             $this->query = $_REQUEST;
 
+            //Create the headers
+            $this->createHeaders();
             //Created the request body
             $this->createRequestBody();
         }
@@ -121,5 +130,42 @@
         {
             header("Location: $location");
             exit(0);
+        }
+        
+        /**
+         * Finds all the headers exisitng in the incoming request and adds them to the headers array
+         */
+        private function createHeaders() : void
+        {
+            if (!function_exists('getallheaders')) {
+                function getallheaders() {
+                    $headers = [];
+                    foreach ($_SERVER as $name => $value) {
+                        if (substr($name, 0, 5) == 'HTTP_') {
+                            $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
+                        }
+                    }
+                    return $headers;
+                }
+            }
+
+            $this->headers = getallheaders();
+        }
+
+        /**
+         * Accesses a specific header or all headers in the request
+         * @return string | null The value of the header requested header
+         * @return array The whole headers array if a header is not specified
+         */
+        public function header(string | null $header = null) : string | null | array
+        {
+            if ($header === null) return $this->headers;
+
+            $value = null;
+            if(isset($this->headers[$header])){
+                $value = $this->headers[$header];
+            }
+
+            return $value;
         }
     }

@@ -1,6 +1,6 @@
 <?php
 
-abstract class Middleware{
+abstract class Middleware extends Controller{
 
     /**
      * Handles incoming requests
