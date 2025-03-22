@@ -11,11 +11,14 @@ function printErrorMessage(string $message, string $errorFile = "File could not 
     ];
 
     $appType = $config["APP_TYPE"];
+    $errorCode = 500;
+
+    http_response_code($errorCode); // set the response code
 
     if ($appType === "api") {
-        header("Content-Type: application/json");
+        $errorObject["code"] = $errorCode;
 
-        $errorObject["code"] = 500;
+        header("Content-Type: application/json");
         echo json_encode($errorObject, JSON_PRETTY_PRINT);
     } else {
         $errorObject["stack"] = $errorStack;
