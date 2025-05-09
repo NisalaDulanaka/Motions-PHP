@@ -68,7 +68,7 @@
         /**
          * Executes all the middleware related specified for the endpoint
          */
-        public function executeMiddleware($handler) : int | null
+        public function executeMiddleware($handler) : int | array | null
         {
             $result = $handler($this->middleware);
 
@@ -78,7 +78,7 @@
         /**
          * Adds a middleware for this route
          */
-        public function middleWare(string $middleWareName,string $className = null) : Route
+        public function middleWare(string $middleWareName,?string $className = null) : Route
         {
             $className = ($className == null)? $middleWareName : $className;
 

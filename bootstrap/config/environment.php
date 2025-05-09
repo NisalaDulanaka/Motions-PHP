@@ -14,4 +14,10 @@
         <br>");
     }
 
+    // @TODO: move this to a separate better suited file
+    function include_all(string $folderName) {
+        foreach (glob("$folderName/*.php") as $filename) { 
+            include_once($filename); 
+        } 
+    }
 ?>

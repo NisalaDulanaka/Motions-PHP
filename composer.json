@@ -1,5 +1,5 @@
 {
     "require": {
-        "opis/closure": "^3.6"
+        "opis/closure": "^4.1"
     }
 }
